@@ -1,9 +1,15 @@
 "use client";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { useFormik } from "formik";
 import { signupSchema } from "@/schemas/signup";
+import { useRouter } from "next/navigation";
+
 const Signup = () => {
+  const [userExists, setUserExists] = useState(false);
+  const [userExistsData, setUserExistsData] = useState("Internal Server Error");
+  const router = useRouter();
+
   const {
     handleChange,
     touched,
@@ -19,9 +25,34 @@ const Signup = () => {
       password: "",
       confirmPassword: "",
     },
-    onSubmit: (values, actions) => {
-      console.log("🚀 ~ Signup ~ values:", values);
-      actions.resetForm();
+    onSubmit: async (values, actions) => {
+      let { name, email, password } = values;
+      let response = await fetch("/api/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+      response = await response.json();
+      if (!response.error) {
+        if (response.ok) {
+          router.push("/login");
+        } else {
+          setUserExists(true);
+          setUserExistsData("Already a user with that email");
+          setTimeout(() => {
+            setUserExists(false);
+          }, 3000);
+        }
+        actions.resetForm();
+      } else {
+        setUserExists(true);
+        setTimeout(() => {
+          setUserExists(false);
+        }, 3000);
+        actions.resetForm();
+      }
     },
     validationSchema: signupSchema,
   });
@@ -124,9 +155,11 @@ const Signup = () => {
           </button>
         </form>
 
-        <div className="bg-red-500 rounded w-[fit-content] px-2 py-1 text-sm mt-3 text-white">
-          Error Message
-        </div>
+        {userExists && (
+          <div className="bg-red-500 rounded w-[fit-content] px-2 py-1 text-sm mt-3 text-white">
+            {userExistsData}
+          </div>
+        )}
 
         <p className="mt-3 text-center">
           Already have an account? &nbsp;

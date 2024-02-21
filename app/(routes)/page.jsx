@@ -1,10 +1,17 @@
 "use client";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { useFormik } from "formik";
 import { loginSchema } from "@/schemas/login";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
+  const [userNotFound, setUserNotFound] = useState(false);
+  const [userNotFoundData, setUserNotFoundData] = useState(
+    "Internal server error"
+  );
+  const router = useRouter();
+
   const {
     handleChange,
     touched,
@@ -18,9 +25,36 @@ const Login = () => {
       email: "",
       password: "",
     },
-    onSubmit: (values, actions) => {
-      console.log("🚀 ~ Login ~ values:", values);
-      actions.resetForm();
+    onSubmit: async (values, actions) => {
+      let { email, password } = values;
+      let response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      response = await response.json();
+      if (!response.error) {
+        if (response.user) {
+          router.push("/dashboard");
+          console.log(response.user);
+        } else {
+          setUserNotFound(true);
+          setUserNotFoundData("User not found");
+          setTimeout(() => {
+            setUserNotFound(false);
+          }, 3000);
+        }
+        actions.resetForm();
+      } else {
+        setUserNotFound(true);
+        setTimeout(() => {
+          setUserNotFound(false);
+        }, 3000);
+        actions.resetForm();
+      }
     },
     validationSchema: loginSchema,
   });
@@ -82,9 +116,11 @@ const Login = () => {
           </button>
         </form>
 
-        <div className="bg-red-500 rounded w-[fit-content] px-2 py-1 text-sm mt-3 text-white">
-          Error Message
-        </div>
+        {userNotFound && (
+          <div className="bg-red-500 rounded w-[fit-content] px-2 py-1 text-sm mt-3 text-white">
+            {userNotFoundData}
+          </div>
+        )}
 
         <p className="mt-3 text-center">
           Don't have an account? &nbsp;

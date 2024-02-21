@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { Button } from "@material-tailwind/react";
 
@@ -7,6 +8,7 @@ const Navbar = () => {
     textShadow:
       "-1px -1px 0 #000, 1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000",
   };
+  const router = useRouter();
   return (
     <nav
       style={{ borderBottom: "1px solid lightgray" }}
@@ -17,12 +19,20 @@ const Navbar = () => {
       </h1>
       <ul className="flex gap-5">
         <li>
-          <Button variant="filled" size="md">
+          <Button
+            onClick={() => router.push("/signup")}
+            variant="filled"
+            size="md"
+          >
             Sign Up
           </Button>
         </li>
         <li>
-          <Button variant="outlined" size="md">
+          <Button
+            onClick={() => router.push("/login")}
+            variant="outlined"
+            size="md"
+          >
             Log In
           </Button>
         </li>

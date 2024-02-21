@@ -27,9 +27,9 @@ const Signup = () => {
   });
 
   return (
-    <main className="flex items-center justify-center mt-2">
+    <main className="flex items-center justify-center h-screen">
       <div className="bg-white p-10 rounded-lg shadow-2xl border">
-        <h1 className="text-2xl font-bold mb-10 text-center">
+        <h1 className="text-2xl font-bold mb-6 text-center">
           Create your account
         </h1>
 
@@ -130,7 +130,7 @@ const Signup = () => {
 
         <p className="mt-3 text-center">
           Already have an account? &nbsp;
-          <Link href="/login" className="text-blue-500 hover:underline">
+          <Link href="/" className="text-blue-500 hover:underline">
             Log In
           </Link>
         </p>
